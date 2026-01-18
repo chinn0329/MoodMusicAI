@@ -1,0 +1,13 @@
+[project]
+name = "moodmusicai"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+dependencies = [
+  "streamlit==1.53.0",
+  "pandas",
+  "numpy",
+  "scikit-learn",
+  "joblib",
+  "opencv-python-headless"
+]
