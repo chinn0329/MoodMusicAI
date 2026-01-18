@@ -1,0 +1,17 @@
+mood,intensity,goal,match
+Happy,Low,,1
+Happy,Medium,,1
+Happy,High,,0
+Sad,Low,,1
+Sad,High,,0
+Stressed,Low,Stress Reduction,1
+Stressed,High,Stress Reduction,1
+Stressed,High,Anxiety Calming,1
+Stressed,Medium,Anxiety Calming,0
+Calm,Low,,1
+Calm,High,,0
+Focused,Medium,,1
+Focused,High,,0
+Focused,Low,,1
+Sad,Medium,Emotional Grounding,1
+Sad,High,Emotional Grounding,0
