@@ -11,3 +11,6 @@ dependencies = [
   "joblib",
   "opencv-python-headless"
 ]
+
+[tool.poetry]
+package-mode = false
