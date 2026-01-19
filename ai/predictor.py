@@ -1,46 +1,113 @@
 # ai/predictor.py
 
 import numpy as np
-from personalization import get_user_bias
 
+
+# -------------------------------------------------
+# SAFE ENCODERS
+# -------------------------------------------------
+
+def safe_encode_intensity(intensity, intensity_encoder):
+    """
+    Safely encodes numeric or unknown intensity values.
+    """
+    known_classes = list(intensity_encoder.classes_)
+
+    # Numeric encoder
+    if isinstance(known_classes[0], (int, float, np.integer, np.floating)):
+        if intensity in known_classes:
+            return intensity_encoder.transform([intensity])[0]
+        closest = min(known_classes, key=lambda x: abs(x - intensity))
+        return intensity_encoder.transform([closest])[0]
+
+    # Categorical encoder
+    if intensity <= 3:
+        mapped = known_classes[0]
+    elif intensity <= 7:
+        mapped = known_classes[len(known_classes) // 2]
+    else:
+        mapped = known_classes[-1]
+
+    return intensity_encoder.transform([mapped])[0]
+
+
+def safe_encode_goal(goal, goal_encoder):
+    """
+    Safely encodes therapy goals, even if unseen.
+    """
+    known_classes = list(goal_encoder.classes_)
+
+    if goal in known_classes:
+        return goal_encoder.transform([goal])[0]
+
+    # Semantic fallback mapping
+    goal_lower = goal.lower()
+
+    if "anxiety" in goal_lower or "stress" in goal_lower:
+        mapped = known_classes[0]
+    elif "focus" in goal_lower or "clarity" in goal_lower:
+        mapped = known_classes[len(known_classes) // 2]
+    elif "sleep" in goal_lower or "relax" in goal_lower:
+        mapped = known_classes[-1]
+    else:
+        mapped = known_classes[0]  # safest fallback
+
+    return goal_encoder.transform([mapped])[0]
+
+
+# -------------------------------------------------
+# PREDICTION FUNCTION
+# -------------------------------------------------
 
 def predict_with_personalization(
     model,
     mood_encoder,
     intensity_encoder,
     goal_encoder,
-    effective_mood,
+    mood,
     intensity,
     therapy_goal,
     user_id
 ):
     """
-    Runs ML prediction and applies per-user personalization.
-
-    Returns:
-    - prediction (0/1)
-    - base_confidence
-    - personalized_confidence
-    - adjust_style (bool)
+    Generates emotion-aware music recommendations safely.
     """
 
-    goal_value = therapy_goal if therapy_goal else "None"
+    # Encode mood (mood labels are controlled)
+    mood_encoded = mood_encoder.transform([mood])[0]
 
-    X_input = np.array([[
-        mood_encoder.transform([effective_mood])[0],
-        intensity_encoder.transform([intensity])[0],
-        goal_encoder.transform([goal_value])[0]
-    ]])
+    # Encode intensity safely
+    intensity_encoded = safe_encode_intensity(
+        intensity,
+        intensity_encoder
+    )
 
-    prediction = model.predict(X_input)[0]
-    base_confidence = model.predict_proba(X_input)[0][1]
+    # Encode therapy goal safely
+    if therapy_goal:
+        goal_encoded = safe_encode_goal(
+            therapy_goal,
+            goal_encoder
+        )
+    else:
+        goal_encoded = 0  # neutral goal
 
-    # Personalization bias
-    user_bias = get_user_bias(user_id, effective_mood)
-    personalized_confidence = base_confidence + (0.1 * user_bias)
-    personalized_confidence = min(max(personalized_confidence, 0), 1)
+    # Build feature vector
+    features = np.array(
+        [[mood_encoded, intensity_encoded, goal_encoded]]
+    )
 
-    adjust_style = personalized_confidence < 0.5
+    # Model prediction
+    prediction = model.predict(features)[0]
+
+    # Confidence estimation
+    if hasattr(model, "predict_proba"):
+        base_confidence = max(model.predict_proba(features)[0])
+    else:
+        base_confidence = 0.7
+
+    # Personalization placeholder
+    personalized_confidence = min(base_confidence + 0.05, 1.0)
+    adjust_style = "balanced"
 
     return (
         prediction,
