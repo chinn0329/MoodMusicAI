@@ -30,5 +30,37 @@
     "avg_feedback": 0,
     "avg_distress": null,
     "avg_calm": null
+  },
+  {
+    "session_id": "fcd13215-0362-4594-914e-2c06f939b4c0",
+    "timestamp": "2026-01-19T07:59:25.790205",
+    "dominant_mood": "Calm",
+    "avg_feedback": 0,
+    "avg_distress": null,
+    "avg_calm": null
+  },
+  {
+    "session_id": "b84d5590-022b-4394-ac2c-b381ebc65684",
+    "timestamp": "2026-01-19T07:59:57.810800",
+    "dominant_mood": "Calm",
+    "avg_feedback": 0,
+    "avg_distress": null,
+    "avg_calm": null
+  },
+  {
+    "session_id": "301b66fa-5cde-4498-8c92-54bca6f8028b",
+    "timestamp": "2026-01-19T08:00:16.852452",
+    "dominant_mood": "Calm",
+    "avg_feedback": 0,
+    "avg_distress": null,
+    "avg_calm": null
+  },
+  {
+    "session_id": "2bb89869-2e56-4080-af8f-1a2a0c1f9f52",
+    "timestamp": "2026-01-19T08:00:35.869926",
+    "dominant_mood": "Calm",
+    "avg_feedback": 0,
+    "avg_distress": null,
+    "avg_calm": null
   }
 ]
